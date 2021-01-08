@@ -80,9 +80,12 @@ class _SignUpFormState extends State<SignUpForm> {
     });
   }
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       onChanged: _updateFormProgress,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -93,14 +96,34 @@ class _SignUpFormState extends State<SignUpForm> {
             padding: EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _firstNameTextController,
-              decoration: InputDecoration(hintText: 'First name'),
+              decoration: InputDecoration(hintText: 'Password'),
+              validator: (value) {
+                if (value.isEmpty) return 'Enter a password';
+                Pattern pattern =
+                    r'^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$';
+                RegExp regex = new RegExp(pattern);
+                if (!regex.hasMatch(value))
+                  return 'Invalid password';
+                else
+                  return null;
+              },
             ),
           ),
           Padding(
             padding: EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _lastNameTextController,
-              decoration: InputDecoration(hintText: 'Last name'),
+              decoration: InputDecoration(hintText: 'Email'),
+              validator: (value) {
+                if (value.isEmpty) return 'Enter a email';
+                Pattern pattern =
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+                RegExp regex = new RegExp(pattern);
+                if (!regex.hasMatch(value))
+                  return 'Invalid email!';
+                else
+                  return null;
+              },
             ),
           ),
           Padding(
@@ -108,6 +131,15 @@ class _SignUpFormState extends State<SignUpForm> {
             child: TextFormField(
               controller: _usernameTextController,
               decoration: InputDecoration(hintText: 'Username'),
+              validator: (value) {
+                if (value.isEmpty) return 'Enter a username';
+                Pattern pattern = r'^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$';
+                RegExp regex = new RegExp(pattern);
+                if (!regex.hasMatch(value))
+                  return 'Invalid username';
+                else
+                  return null;
+              },
             ),
           ),
           TextButton(
@@ -125,7 +157,18 @@ class _SignUpFormState extends State<SignUpForm> {
                     : Colors.blue;
               }),
             ),
-            onPressed: _formProgress == 1 ? _showWelcomeScreen : null,
+            onPressed: () {
+              // _formProgress == 1 ? _showWelcomeScreen : null;
+              // Validate returns true if the form is valid, otherwise false.
+              if (_formKey.currentState.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                // ignore: unnecessary_statements
+                _showWelcomeScreen();
+                // Scaffold.of(context)
+                //     .showSnackBar(SnackBar(content: Text('Processing Data')));
+              }
+            },
             child: Text('Sign up'),
           ),
         ],
